@@ -23,10 +23,13 @@ connection.connect(function(err) {
         name: "add",
         type: "list",
         message: "Would you like to do?",
-        choices: ["Add department", "Add role", "Add employee"]
+        choices: ["View all employees", "Add department", "Add role", "Add employee"]
       })
       .then(function(answer) {
         // based on their answer, either call the bid or the post functions
+        if (answer.add === "View all employees") {
+          viewEmployees();
+        }
         if (answer.add === "Add department") {
           addDepartment();
         }
@@ -39,6 +42,17 @@ connection.connect(function(err) {
           connection.end();
         }
       });
+  }
+
+  function viewEmployees(){
+    let sql = "SELECT employee.id, employee.first_name, employee.last_name, employee_role.title, employee_role.salary, department.department_name as department FROM employee LEFT JOIN employee_role ON employee.role_id = employee_role.id LEFT JOIN department ON employee_role.department_id = department.id";
+        
+    connection.query(sql, (error, results) => {
+      console.table(results);
+      if (error) {
+        return console.error(error.message);
+      }
+    });
   }
 
   function addDepartment() {
@@ -60,13 +74,15 @@ connection.connect(function(err) {
           },
           function(err) {
             if (err) throw err;
-            console.log("Your auction was created successfully!");
+            console.log("Department was added successfully!");
             // re-prompt the user for if they want to add department
             start();
           }
         );
       });
   }
+
+ 
 
   function addRole() {
     inquirer
@@ -97,7 +113,7 @@ connection.connect(function(err) {
           },
           function(err) {
             if (err) throw err;
-            console.log("Your auction was created successfully!");
+            console.log("Role was added successfully!");
             start();
           }
         );
@@ -143,7 +159,7 @@ connection.connect(function(err) {
           },
           function(err) {
             if (err) throw err;
-            console.log("Your auction was created successfully!");
+            console.log("Employee was added successfully!");
             start();
           }
         );
