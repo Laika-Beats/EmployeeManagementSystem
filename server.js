@@ -23,7 +23,7 @@ connection.connect(function(err) {
         name: "add",
         type: "list",
         message: "Would you like to do?",
-        choices: ["View all employees", "Add department", "Add role", "Add employee"]
+        choices: ["View all employees", "Add department", "Add role", "Add employee", "Update Employee Roles"]
       })
       .then(function(answer) {
         // based on their answer, either call the bid or the post functions
@@ -38,11 +38,16 @@ connection.connect(function(err) {
         } 
         else if(answer.add === "Add employee") {
           addEmployee();
+        }
+        else if(answer.add === "Update Employee Roles") {
+          updateRoles();
         }else{
           connection.end();
         }
       });
   }
+
+  
 
   function viewEmployees(){
     let sql = "SELECT employee.id, employee.first_name, employee.last_name, employee_role.title, employee_role.salary, department.department_name as department FROM employee LEFT JOIN employee_role ON employee.role_id = employee_role.id LEFT JOIN department ON employee_role.department_id = department.id";
@@ -163,5 +168,50 @@ connection.connect(function(err) {
             start();
           }
         );
+       
       });
+    
+
   }
+  function updateRoles() {
+    inquirer
+      .prompt([
+        {
+          name: "updateID",
+          type: "input",
+          message: "What is the ID of the employee role?"
+        },
+        {
+          name: "updateTitle",
+          type: "input",
+          message: "What is the title of the employee role?"
+        },
+        {
+          name: "updateSalary",
+          type: "input",
+          message: "What is the salary of the employee role?"
+        },
+        {
+          name: "updateDepartment",
+          type: "input",
+          message: "What is the department ID of the employee role?"
+        },
+      ])
+      .then(function(answer){
+        console.log("Updating all employee roles...\n");
+        connection.query(
+          "UPDATE employee_role SET ? WHERE id = " + answer.updateID,
+          [
+            {
+              title: answer.updateTitle,
+              salary: answer.updateSalary,
+              department_id: answer.updateDepartment
+            }
+          ],
+          function(err, res) {
+            if (err) throw err;
+            start();
+          }
+        );
+      })
+    }
