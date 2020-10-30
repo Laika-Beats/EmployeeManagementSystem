@@ -6,7 +6,7 @@ var connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  password: "jT3037266954!",
+  password: "",
   database: "employeeDB"
 });
 
@@ -50,9 +50,9 @@ connection.connect(function(err) {
   
 
   function viewEmployees(){
-    let sql = "SELECT employee.id, employee.first_name, employee.last_name, employee_role.title, employee_role.salary, department.department_name as department FROM employee LEFT JOIN employee_role ON employee.role_id = employee_role.id LEFT JOIN department ON employee_role.department_id = department.id";
+    let joinTables = "SELECT employee.id, employee.first_name, employee.last_name, employee_role.title, employee_role.salary, department.department_name as department FROM employee LEFT JOIN employee_role ON employee.role_id = employee_role.id LEFT JOIN department ON employee_role.department_id = department.id";
         
-    connection.query(sql, (error, results) => {
+    connection.query(joinTables, (error, results) => {
       console.table(results);
       if (error) {
         return console.error(error.message);
@@ -173,28 +173,29 @@ connection.connect(function(err) {
     
 
   }
+
   function updateRoles() {
     inquirer
       .prompt([
         {
           name: "updateID",
           type: "input",
-          message: "What is the ID of the employee role?"
+          message: "What is the ID of the employee role you want to update?"
         },
         {
           name: "updateTitle",
           type: "input",
-          message: "What is the title of the employee role?"
+          message: "What is the new title of the employee role?"
         },
         {
           name: "updateSalary",
           type: "input",
-          message: "What is the salary of the employee role?"
+          message: "What is the new salary of the employee role?"
         },
         {
           name: "updateDepartment",
           type: "input",
-          message: "What is the department ID of the employee role?"
+          message: "What is the new department ID of the employee role?"
         },
       ])
       .then(function(answer){
