@@ -15,7 +15,7 @@ A command-line application for managing a company's employees using node, inquir
 
  Usage:
 
-/EmployeeTracker.gif
+./EmployeeTracker.gif
 
 
  Contact:
