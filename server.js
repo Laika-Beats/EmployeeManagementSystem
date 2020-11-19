@@ -1,12 +1,24 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var figlet = require('figlet');
+
+figlet('SOMEHOW-I-MANAGE', function(err, data) {
+  if (err) {
+  console.log('Something went wrong...');
+  console.dir(err);
+  return;
+  }
+  console.log("\n============================")
+  console.log(data)
+  console.log("\n============================\n\n\n\n\n\n")
+});
 
 // create the connection information for the sql database
 var connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  password: "",
+  password: "password",
   database: "employeeDB"
 });
 
@@ -23,37 +35,63 @@ connection.connect(function(err) {
         name: "add",
         type: "list",
         message: "Would you like to do?",
-        choices: ["View all employees", "Add department", "Add role", "Add employee", "Update Employee Roles"]
+        choices: ["View all employees", "View all departments", "View all employee roles", "Add department", "Add role", "Add employee", "Update employee roles"]
       })
       .then(function(answer) {
         // based on their answer, either call the bid or the post functions
         if (answer.add === "View all employees") {
           viewEmployees();
         }
+        if (answer.add === "View all departments") {
+          viewDepartments();
+        }
+        if (answer.add === "View all employee roles") {
+          viewRoles();
+        }
         if (answer.add === "Add department") {
           addDepartment();
         }
-        else if(answer.add === "Add role") {
+        if(answer.add === "Add role") {
           addRole();
         } 
-        else if(answer.add === "Add employee") {
+        if(answer.add === "Add employee") {
           addEmployee();
         }
-        else if(answer.add === "Update Employee Roles") {
+        if(answer.add === "Update employee roles") {
           updateRoles();
-        }else{
-          connection.end();
         }
       });
   }
-
-  
 
   function viewEmployees(){
     let joinTables = "SELECT employee.id, employee.first_name, employee.last_name, employee_role.title, employee_role.salary, department.department_name as department FROM employee LEFT JOIN employee_role ON employee.role_id = employee_role.id LEFT JOIN department ON employee_role.department_id = department.id";
         
     connection.query(joinTables, (error, results) => {
       console.table(results);
+      start();
+      if (error) {
+        return console.error(error.message);
+        
+      }
+    });
+  }
+
+  function viewDepartments(){
+        
+    connection.query("SELECT department.id, department.department_name FROM department", (error, results) => {
+      console.table(results);
+      start();
+      if (error) {
+        return console.error(error.message);
+      }
+    });
+  }
+
+  function viewRoles(){
+        
+    connection.query("SELECT employee_role.id, employee_role.title, employee_role.salary FROM employee_role", (error, results) => {
+      console.table(results);
+      start();
       if (error) {
         return console.error(error.message);
       }
@@ -199,7 +237,6 @@ connection.connect(function(err) {
         },
       ])
       .then(function(answer){
-        console.log("Updating all employee roles...\n");
         connection.query(
           "UPDATE employee_role SET ? WHERE id = " + answer.updateID,
           [
@@ -211,6 +248,7 @@ connection.connect(function(err) {
           ],
           function(err, res) {
             if (err) throw err;
+            console.log("Updating all employee roles...\n");
             start();
           }
         );
